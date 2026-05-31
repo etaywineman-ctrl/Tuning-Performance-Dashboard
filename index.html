@@ -1191,8 +1191,8 @@
         3. Strategic Action Items for the S&OP Alignment Meeting (specifically referencing any segments labeled with Pass Rule: NO).`;
 
         try {
-            // Using the user-provided API key from the input field
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKeyInput}`;
+            // Using the target gemini-3-flash-preview model for optimized, fast analysis
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKeyInput}`;
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -1203,8 +1203,19 @@
                 })
             });
             
+            let errorMessage = "Invalid API Key or API Error. Please check your key and try again.";
+            
+            // Extract precise error feedback from Google's response if the connection fails
             if (!response.ok) {
-                throw new Error("Invalid API Key or API Error. Please check your key and try again.");
+                try {
+                    const errorJson = await response.json();
+                    if (errorJson.error && errorJson.error.message) {
+                        errorMessage = `Google API Error: ${errorJson.error.message} (Code: ${errorJson.error.code || 'Unknown'})`;
+                    }
+                } catch (e) {
+                    errorMessage = `HTTP Error ${response.status}: ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
@@ -1237,16 +1248,18 @@
 
         } catch (error) {
             console.error(error);
-            // Fallback narrative block to guarantee high-fidelity UX even if API fails or key is wrong
+            // Dynamic on-screen diagnostic rendering
             container.innerHTML = `
-                <div class="border border-amber-500/20 bg-slate-950/80 p-5 rounded-xl text-slate-300">
-                    <p class="text-amber-400 text-xs font-bold mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-triangle-exclamation"></i> API Connection Error
+                <div class="border border-rose-500/20 bg-slate-950/80 p-5 rounded-xl text-slate-300">
+                    <p class="text-rose-400 text-xs font-bold mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation"></i> API Connection Issue Detected
                     </p>
                     <p class="text-xs leading-relaxed mb-4">
-                        ${error.message || "We were unable to establish a secure handshake with the live Gemini service."} Please ensure your API key is correct and valid.
+                        ${error.message}
                     </p>
-                    <p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-3">In the meantime, the static AI fallback evaluation remains active.</p>
+                    <p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-3">
+                        Troubleshooting Tip: Click the copy icon in Google AI Studio to make sure the key wasn't truncated, and paste it directly into the input.
+                    </p>
                 </div>
             `;
         } finally {
