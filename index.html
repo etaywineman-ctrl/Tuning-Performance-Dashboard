@@ -4,125 +4,728 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ODMC Tuning Performance Readout & Decision Analyzer</title>
+    <!-- Tailwind CSS for modern, sleek design system -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for clean, animated reporting visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse for Client-Side ODMC CSV processing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- FontAwesome for professional modern icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
+<!-- HEADER -->
 <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="bg-gradient-to-tr from-cyan-500 to-indigo-600 p-2 rounded-lg shadow-inner">
-                <i class="fa-solid fa-chart-line text-lg text-white"></i>
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-cyan-500 to-indigo-600 p-2 rounded-lg shadow-inner">
+                    <i class="fa-solid fa-chart-line text-lg text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight">Analytical Factor</h1>
+                    <p class="text-xs text-slate-400 font-medium">Oracle ODMC Tuning Engine Readout</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-lg font-bold tracking-tight">Analytical Factor</h1>
-                <p class="text-xs text-slate-400 font-medium">Oracle ODMC Tuning Engine Readout</p>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div class="hidden md:flex items-center space-x-2 text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                <i class="fa-solid fa-shield-halved text-emerald-500"></i>
+                <span>Client Data Secured Locally</span>
             </div>
         </div>
     </div>
 </header>
 
+<!-- MAIN CONTENT -->
 <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    
+    <!-- Page Title & Context -->
+    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+            <div class="flex items-center space-x-2 mb-2">
+                <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Project Phase: Evaluation</span>
+                <span class="text-slate-400 text-sm">•</span>
+                <span class="text-slate-500 text-sm font-medium"><i class="fa-regular fa-calendar-days mr-1"></i> Current Assessment</span>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900">ODMC Forecast Engine Performance Analyzer</h2>
+            <p class="text-slate-600 mt-1 max-w-3xl">
+                Compare tuned engine performance against <strong>Legacy ODMC</strong> and <strong>Naïve Baselines</strong>. Adjust target thresholds dynamically to inspect acceptance statuses.
+            </p>
+        </div>
+        <div class="flex space-x-2">
+            <button onclick="restoreDefaultDataSet()" class="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm flex items-center">
+                <i class="fa-solid fa-rotate-left mr-2"></i> Reset Demo Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 overflow-hidden">
-        <nav class="flex border-b border-slate-200 overflow-x-auto">
-            <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active py-4 px-6 font-medium text-sm text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50 flex items-center space-x-2">
-                <i class="fa-solid fa-chart-pie"></i> <span>Overview</span>
+        <nav class="flex border-b border-slate-200 overflow-x-auto custom-scrollbar">
+            <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active py-3 px-6 font-medium text-sm text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50 hover:bg-indigo-50 transition-all duration-150 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Overview</span>
             </button>
-            <button onclick="switchTab('segment-grid')" id="tab-segment-grid" class="tab-btn py-4 px-6 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 flex items-center space-x-2">
-                <i class="fa-solid fa-list-check"></i> <span>Segment Analysis</span>
+            <button onclick="switchTab('segment-grid')" id="tab-segment-grid" class="tab-btn py-3 px-6 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Segment Analysis</span>
             </button>
-            <button onclick="switchTab('fva')" id="tab-fva" class="tab-btn py-4 px-6 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 flex items-center space-x-2">
-                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Data & Import</span>
+            <button onclick="switchTab('fva')" id="tab-fva" class="tab-btn py-3 px-6 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2 whitespace-nowrap">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Data & Import</span>
             </button>
         </nav>
 
         <div class="p-6">
-            <!-- TAB 1: OVERVIEW -->
+            
+            <!-- TAB 1: OVERVIEW & KPIs -->
             <div id="section-overview" class="block space-y-6">
+                
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Left Sidebar: Interactive Acceptance Rules -->
                     <div class="lg:col-span-1 space-y-4">
                         <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                            <h3 class="font-bold text-slate-800 text-sm mb-4">Acceptance Rules</h3>
-                            <div class="space-y-4">
+                            <div class="flex items-center space-x-2 mb-4 pb-2 border-b border-slate-200">
+                                <i class="fa-solid fa-scale-balanced text-slate-500"></i>
+                                <h3 class="font-bold text-slate-800 text-sm">Acceptance Rules</h3>
+                            </div>
+                            
+                            <div class="space-y-5">
+                                <!-- Rule 1 -->
                                 <div>
-                                    <label class="text-xs font-semibold text-slate-700">Min. Runner WAPE Impr.</label>
-                                    <input type="range" id="rule-runner-wape" min="0" max="15" step="0.5" value="5.0" class="w-full h-2 accent-indigo-600 cursor-pointer">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="text-xs font-semibold text-slate-700">Min. Runner WAPE Impr.</label>
+                                        <span id="val-runner-wape" class="text-xs font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">5.0%</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 mb-2 leading-tight">Minimum relative WAPE reduction vs Legacy ODMC.</p>
+                                    <input type="range" id="rule-runner-wape" min="0" max="15" step="0.5" value="5.0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
                                 </div>
+
+                                <!-- Rule 2 -->
                                 <div>
-                                    <label class="text-xs font-semibold text-slate-700">Min. Repeater WAPE Impr.</label>
-                                    <input type="range" id="rule-repeater-wape" min="0" max="10" step="0.5" value="3.0" class="w-full h-2 accent-indigo-600 cursor-pointer">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="text-xs font-semibold text-slate-700">Min. Repeater WAPE Impr.</label>
+                                        <span id="val-repeater-wape" class="text-xs font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">3.0%</span>
+                                    </div>
+                                    <input type="range" id="rule-repeater-wape" min="0" max="10" step="0.5" value="3.0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                                </div>
+
+                                <!-- Rule 3 -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <label class="text-xs font-semibold text-slate-700">Acceptable Bias Range (±)</label>
+                                        <span id="val-bias-range" class="text-xs font-bold text-indigo-600 bg-indigo-100 px-1.5 py-0.5 rounded">5.0%</span>
+                                    </div>
+                                    <p class="text-[10px] text-slate-500 mb-2 leading-tight">Tuned Bias must remain within this absolute +/- boundary.</p>
+                                    <input type="range" id="rule-bias-range" min="1" max="15" step="0.5" value="5.0" class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
                                 </div>
                             </div>
+
+                            <button onclick="resetThresholds()" class="mt-5 w-full py-2 text-xs font-medium text-slate-500 hover:text-slate-800 bg-white border border-slate-200 rounded transition-colors shadow-sm">
+                                Reset Defaults
+                            </button>
                         </div>
                     </div>
+
+                    <!-- Right Side: KPIs and Charts -->
                     <div class="lg:col-span-3 space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                                <span class="text-xs text-slate-400 uppercase font-bold">Overall Pass Rate</span>
-                                <div id="kpi-pass-rate" class="text-3xl font-extrabold text-slate-800">0%</div>
+                        
+                        <!-- Top KPI Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Overall Pass Rate -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-300 transition-colors">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <i class="fa-solid fa-check-double text-4xl text-indigo-600"></i>
+                                </div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Overall Pass Rate</span>
+                                <div class="flex items-baseline space-x-2">
+                                    <span id="kpi-pass-rate" class="text-3xl font-extrabold text-slate-800">0%</span>
+                                    <span id="kpi-pass-fraction" class="text-sm font-medium text-slate-500">0/0 Segments</span>
+                                </div>
+                                <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
+                                    <div id="kpi-pass-bar" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                                <span class="text-xs text-slate-400 uppercase font-bold">Vol-Weighted WAPE Impr.</span>
-                                <div id="kpi-wape-impr" class="text-3xl font-extrabold text-emerald-600">0.0%</div>
+
+                            <!-- Avg WAPE Improvement -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-300 transition-colors">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <i class="fa-solid fa-arrow-trend-down text-4xl text-emerald-600"></i>
+                                </div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Vol-Weighted WAPE Impr.</span>
+                                <div class="flex items-baseline space-x-2">
+                                    <span id="kpi-wape-impr" class="text-3xl font-extrabold text-slate-800">0.0%</span>
+                                    <span class="text-sm font-medium text-emerald-600"><i class="fa-solid fa-caret-down"></i> vs Legacy</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-2">Relative reduction in aggregate WAPE error.</p>
+                            </div>
+
+                            <!-- Bias Correction -->
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:border-indigo-300 transition-colors">
+                                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                    <i class="fa-solid fa-bullseye text-4xl text-blue-600"></i>
+                                </div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Agg. Bias Delta</span>
+                                <div class="flex items-baseline space-x-2">
+                                    <span id="kpi-bias-delta" class="text-3xl font-extrabold text-slate-800">0.0%</span>
+                                </div>
+                                <p class="text-[10px] text-slate-500 mt-2">Shift closer to 0% zero-bias baseline.</p>
                             </div>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                            <canvas id="chartWape" class="h-64"></canvas>
+
+                        <!-- Charts Section -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <div class="mb-4 flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-800 text-sm">FVA: WAPE Comparison by Segment</h3>
+                                    <span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded">Lower is Better</span>
+                                </div>
+                                <div class="h-64 relative">
+                                    <canvas id="chartWape"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <div class="mb-4 flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-800 text-sm">Directional Bias Shift</h3>
+                                    <span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded">Closer to 0 is Better</span>
+                                </div>
+                                <div class="h-64 relative">
+                                    <canvas id="chartBias"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: DETAILED INTERACTIVE SEGMENT GRID -->
+            <div id="section-segment-grid" class="hidden space-y-6">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-900">Segment Compliance Matrix</h3>
+                        <p class="text-xs text-slate-500">Live evaluation of each business unit against the dynamic thresholds set in the overview tab.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-100">
+                                    <th class="py-4 px-6">Demand Segment & Business Unit</th>
+                                    <th class="py-4 px-4 text-center">Lag</th>
+                                    <th class="py-4 px-4 text-right">M. Vol (Units)</th>
+                                    <th class="py-4 px-4 text-right bg-indigo-50/30 text-indigo-900">Naive WAPE</th>
+                                    <th class="py-4 px-4 text-right bg-rose-50/50 text-rose-900">Legacy WAPE</th>
+                                    <th class="py-4 px-4 text-right bg-emerald-50/50 text-emerald-900">Tuned WAPE</th>
+                                    <th class="py-4 px-4 text-center">Rel. Impr.</th>
+                                    <th class="py-4 px-6 text-center">Acceptance Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grid-table-body" class="divide-y divide-slate-50 text-sm text-slate-700">
+                                <!-- Generated Dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: DATA & IMPORT (FVA) -->
+            <div id="section-fva" class="hidden space-y-8">
+                
+                <!-- ODMC SaaS CSV Import Tool -->
+                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-100 shadow-sm">
+                    <div class="flex flex-col md:flex-row items-start justify-between gap-4">
+                        <div>
+                            <h3 class="font-bold text-indigo-900 text-base mb-1 flex items-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up text-indigo-600"></i> Raw ODMC Data Importer
+                            </h3>
+                            <p class="text-xs text-indigo-700 mb-3 max-w-xl">Upload your raw ODMC extraction. The dashboard will automatically group the data by Business Unit, sum the actuals, and calculate WAPE and Bias formulas.</p>
+                            <div class="flex items-center gap-3">
+                                <input type="file" id="odmc-csv-upload" accept=".csv" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer transition">
+                            </div>
+                        </div>
+                        <div class="w-full md:w-auto bg-white/60 p-3 rounded-lg border border-indigo-100 text-[10px] text-indigo-800 font-mono shadow-sm">
+                            <strong class="block mb-1 border-b border-indigo-200 pb-1">Required CSV Columns for FVA Math:</strong>
+                            Plan, Business Unit, Item, Customer, Date, History, NaiveForecast, LegacyForecast, TunedForecast
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Editable Data Grid -->
+                    <div class="lg:col-span-2">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-slate-800">Active Aggregated Data</h3>
+                            <span class="text-xs text-slate-400"><i class="fa-solid fa-pen-to-square mr-1"></i> Table is directly editable</span>
+                        </div>
+                        <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl mb-4">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 text-slate-500 font-bold uppercase border-b border-slate-200">
+                                        <th class="p-3">Business Unit</th>
+                                        <th class="p-3 text-right">Est. Volume</th>
+                                        <th class="p-3 text-right">Leg. WAPE</th>
+                                        <th class="p-3 text-right">Tuned WAPE</th>
+                                        <th class="p-3 text-right">Leg. Bias</th>
+                                        <th class="p-3 text-right">Tuned Bias</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="workspace-table-body">
+                                    <!-- Loaded dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button onclick="restoreDefaultDataSet()" class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                                Reset Demo Data
+                            </button>
+                            <button onclick="applyWorkspaceChanges()" class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors shadow-sm">
+                                Save & Apply Calculations
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FVA Formulas Appendix -->
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">Calculation Methodology</h3>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <strong class="text-slate-900 block mb-1">Volume-Weighted WAPE</strong>
+                            <p class="text-[10px] text-slate-600 mb-2">Calculates aggregate accuracy weighting high-volume items appropriately.</p>
+                            <div class="bg-slate-50 p-2 rounded text-center text-[10px] font-mono text-indigo-800">
+                                WAPE = Σ(|Actual - Forecast|) / Σ(Actual)
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <strong class="text-slate-900 block mb-1">Aggregate Bias %</strong>
+                            <p class="text-[10px] text-slate-600 mb-2">Measures systematic over-forecasting (+) or under-forecasting (-).</p>
+                            <div class="bg-slate-50 p-2 rounded text-center text-[10px] font-mono text-indigo-800">
+                                Bias % = Σ(Forecast - Actual) / Σ(Actual)
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 2: SEGMENT ANALYSIS (GRID) -->
-            <div id="section-segment-grid" class="hidden">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-slate-50 border-b text-slate-500 uppercase text-[10px] font-bold">
-                            <th class="p-4">Business Unit</th>
-                            <th class="p-4">Legacy WAPE</th>
-                            <th class="p-4">Tuned WAPE</th>
-                            <th class="p-4">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="grid-table-body"></tbody>
-                </table>
-            </div>
-
-            <!-- TAB 3: DATA & IMPORT -->
-            <div id="section-fva" class="hidden">
-                <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-                    <h3 class="font-bold text-indigo-900 mb-2">Import ODMC Data</h3>
-                    <input type="file" id="odmc-csv-upload" accept=".csv" class="text-xs text-slate-500">
-                    <p class="text-[10px] text-indigo-700 mt-2">Required: Plan, Business Unit, Item, Customer, Date, History, NaiveForecast, LegacyForecast, TunedForecast</p>
-                </div>
-            </div>
         </div>
     </div>
 </main>
 
+<!-- Toast Notification Area -->
+<div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
 <script>
-    let activeData = [
-        { id: 1, segment: "Runners", businessUnit: "Cell Culture Media", volume: 125000, naiveWape: 35.0, legacyWape: 28.5, tunedWape: 22.8, legacyBias: 6.2, tunedBias: 1.2 },
-        { id: 2, segment: "Repeaters", businessUnit: "Reagents", volume: 45000, naiveWape: 48.0, legacyWape: 38.0, tunedWape: 31.5, legacyBias: 7.4, tunedBias: 2.3 }
+    // State Data: Realistic Mock Data representation
+    let baseDataSet = [
+        { id: 1, segment: "Runners", businessUnit: "Cell Culture Media", lag: 1, volume: 125000, naiveWape: 35.0, legacyWape: 28.5, tunedWape: 22.8, legacyBias: 6.2, tunedBias: 1.2 },
+        { id: 2, segment: "Runners", businessUnit: "Cell Culture Media", lag: 3, volume: 125000, naiveWape: 41.0, legacyWape: 34.0, tunedWape: 28.0, legacyBias: 8.5, tunedBias: -2.1 },
+        { id: 3, segment: "Runners", businessUnit: "Purification Columns", lag: 1, volume: 98000, naiveWape: 30.0, legacyWape: 24.0, tunedWape: 18.5, legacyBias: -4.8, tunedBias: -0.5 },
+        { id: 4, segment: "Repeaters", businessUnit: "Antibodies & Reagents", lag: 1, volume: 45000, naiveWape: 48.0, legacyWape: 38.0, tunedWape: 31.5, legacyBias: 7.4, tunedBias: 2.3 },
+        { id: 5, segment: "Repeaters", businessUnit: "Precision Pipette Tips", lag: 1, volume: 62000, naiveWape: 33.0, legacyWape: 29.0, tunedWape: 24.2, legacyBias: -5.5, tunedBias: 1.8 },
+        { id: 6, segment: "Strangers", businessUnit: "Specialty Assay Kits", lag: 1, volume: 12000, naiveWape: 68.0, legacyWape: 59.0, tunedWape: 51.0, legacyBias: 15.4, tunedBias: 4.8 }
     ];
 
-    function switchTab(tab) {
-        ['overview', 'segment-grid', 'fva'].forEach(t => document.getElementById('section-'+t).classList.add('hidden'));
-        document.getElementById('section-'+tab).classList.remove('hidden');
+    let activeData = [];
+    let ruleState = { runnerWape: 5.0, repeaterWape: 3.0, biasRange: 5.0 };
+    let chartInstanceWape = null;
+    let chartInstanceBias = null;
+
+    // Window Onload - Ensure everything fires immediately!
+    window.onload = function() {
+        loadStateFromBrowser();
+        setupEventListeners();
+        setupCSVUploader();
+        evaluateEngineMetrics();
+        renderOverviewCharts();
+        renderGridTable();
+        renderWorkspaceTable();
+    };
+
+    function switchTab(tabName) {
+        document.getElementById('section-overview').classList.add('hidden');
+        document.getElementById('section-segment-grid').classList.add('hidden');
+        document.getElementById('section-fva').classList.add('hidden');
+
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50/50');
+            btn.classList.add('text-slate-500', 'border-transparent');
+        });
+
+        document.getElementById(`section-${tabName}`).classList.remove('hidden');
+        const activeBtn = document.getElementById(`tab-${tabName}`);
+        activeBtn.classList.remove('text-slate-500', 'border-transparent');
+        activeBtn.classList.add('active', 'text-indigo-600', 'border-indigo-600', 'bg-indigo-50/50');
     }
 
-    // Initialize charts and tables here (simplified for brevity, logic remains from previous step)
-    window.onload = () => { /* Render logic here */ };
+    function setupCSVUploader() {
+        const fileInput = document.getElementById('odmc-csv-upload');
+        if(fileInput) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        try {
+                            const rawData = results.data;
+                            let grouped = {};
+                            
+                            // Aggregate rows by Business Unit
+                            rawData.forEach(row => {
+                                if(!row['Business Unit'] || typeof row.History === 'undefined') return;
+                                let key = `${row['Business Unit']}`;
+                                
+                                if(!grouped[key]) {
+                                    grouped[key] = {
+                                        segment: "Runners", // Default assumption
+                                        businessUnit: row['Business Unit'],
+                                        lag: 1, 
+                                        sumActual: 0,
+                                        sumAbsErrNaive: 0,
+                                        sumAbsErrLegacy: 0,
+                                        sumAbsErrTuned: 0,
+                                        sumErrLegacy: 0,
+                                        sumErrTuned: 0
+                                    };
+                                }
+                                
+                                let actual = parseFloat(row.History) || 0;
+                                let naive = parseFloat(row.NaiveForecast) || parseFloat(row.Forecast) || 0;
+                                let legacy = parseFloat(row.LegacyForecast) || parseFloat(row.Forecast) || 0;
+                                let tuned = parseFloat(row.TunedForecast) || parseFloat(row.Forecast) || 0;
+                                
+                                grouped[key].sumActual += actual;
+                                grouped[key].sumAbsErrNaive += Math.abs(naive - actual);
+                                grouped[key].sumAbsErrLegacy += Math.abs(legacy - actual);
+                                grouped[key].sumAbsErrTuned += Math.abs(tuned - actual);
+                                grouped[key].sumErrLegacy += (legacy - actual);
+                                grouped[key].sumErrTuned += (tuned - actual);
+                            });
+
+                            let newData = [];
+                            let idCounter = 1;
+                            for (let key in grouped) {
+                                let g = grouped[key];
+                                let actVol = g.sumActual > 0 ? g.sumActual : 1; 
+                                
+                                newData.push({
+                                    id: idCounter++,
+                                    segment: g.segment,
+                                    businessUnit: g.businessUnit,
+                                    lag: g.lag,
+                                    volume: g.sumActual,
+                                    naiveWape: parseFloat(((g.sumAbsErrNaive / actVol) * 100).toFixed(1)),
+                                    legacyWape: parseFloat(((g.sumAbsErrLegacy / actVol) * 100).toFixed(1)),
+                                    tunedWape: parseFloat(((g.sumAbsErrTuned / actVol) * 100).toFixed(1)),
+                                    legacyBias: parseFloat(((g.sumErrLegacy / actVol) * 100).toFixed(1)),
+                                    tunedBias: parseFloat(((g.sumErrTuned / actVol) * 100).toFixed(1))
+                                });
+                            }
+                            
+                            activeData = newData;
+                            saveStateToBrowser();
+                            evaluateEngineMetrics();
+                            renderOverviewCharts();
+                            renderGridTable();
+                            renderWorkspaceTable();
+                            alertToast("ODMC Data Successfully Imported & Calculated", "emerald");
+                            fileInput.value = ''; 
+                        } catch (err) {
+                            alertToast("Error reading CSV. Check headers.", "rose");
+                            console.error(err);
+                        }
+                    }
+                });
+            });
+        }
+    }
+
+    function setupEventListeners() {
+        const sliders = [
+            { id: 'rule-runner-wape', key: 'runnerWape', labelId: 'val-runner-wape' },
+            { id: 'rule-repeater-wape', key: 'repeaterWape', labelId: 'val-repeater-wape' },
+            { id: 'rule-bias-range', key: 'biasRange', labelId: 'val-bias-range' }
+        ];
+
+        sliders.forEach(s => {
+            const el = document.getElementById(s.id);
+            el.value = ruleState[s.key];
+            document.getElementById(s.labelId).innerText = ruleState[s.key].toFixed(1) + '%';
+            
+            el.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                ruleState[s.key] = val;
+                document.getElementById(s.labelId).innerText = val.toFixed(1) + '%';
+                saveStateToBrowser();
+                evaluateEngineMetrics();
+                renderGridTable();
+            });
+        });
+    }
+
+    function evaluateEngineMetrics() {
+        let totalItems = activeData.length;
+        let passedItems = 0;
+        let totalVolume = 0;
+        let sumLegacyWapeWeight = 0;
+        let sumTunedWapeWeight = 0;
+        let sumLegacyBiasWeight = 0;
+        let sumTunedBiasWeight = 0;
+
+        activeData.forEach(item => {
+            let wapeImpr = item.legacyWape > 0 ? ((item.legacyWape - item.tunedWape) / item.legacyWape) * 100 : 0;
+            let passed = false;
+
+            if (item.segment === "Runners" && wapeImpr >= ruleState.runnerWape && Math.abs(item.tunedBias) <= ruleState.biasRange) {
+                passed = true;
+            } else if (item.segment === "Repeaters" && wapeImpr >= ruleState.repeaterWape && Math.abs(item.tunedBias) <= ruleState.biasRange) {
+                passed = true;
+            } else if (item.segment === "Strangers" && item.tunedWape <= item.legacyWape && Math.abs(item.tunedBias) <= ruleState.biasRange) {
+                passed = true;
+            }
+
+            if(passed) passedItems++;
+
+            totalVolume += item.volume;
+            sumLegacyWapeWeight += (item.legacyWape * item.volume);
+            sumTunedWapeWeight += (item.tunedWape * item.volume);
+            sumLegacyBiasWeight += (item.legacyBias * item.volume);
+            sumTunedBiasWeight += (item.tunedBias * item.volume);
+            
+            item.passed = passed;
+            item.wapeImpr = wapeImpr;
+        });
+
+        // Update KPIs
+        let passRate = totalItems > 0 ? (passedItems / totalItems) * 100 : 0;
+        document.getElementById('kpi-pass-rate').innerText = passRate.toFixed(0) + '%';
+        document.getElementById('kpi-pass-fraction').innerText = `${passedItems}/${totalItems} Segments`;
+        document.getElementById('kpi-pass-bar').style.width = passRate + '%';
+        
+        let passBarClass = passRate >= 80 ? 'bg-emerald-500' : (passRate >= 50 ? 'bg-amber-500' : 'bg-rose-500');
+        document.getElementById('kpi-pass-bar').className = `${passBarClass} h-full transition-all duration-500`;
+
+        if(totalVolume > 0) {
+            let aggLegacyWape = sumLegacyWapeWeight / totalVolume;
+            let aggTunedWape = sumTunedWapeWeight / totalVolume;
+            let totalWapeImpr = aggLegacyWape > 0 ? ((aggLegacyWape - aggTunedWape) / aggLegacyWape) * 100 : 0;
+            document.getElementById('kpi-wape-impr').innerText = totalWapeImpr.toFixed(1) + '%';
+
+            let aggLegacyBias = sumLegacyBiasWeight / totalVolume;
+            let aggTunedBias = sumTunedBiasWeight / totalVolume;
+            let biasDelta = Math.abs(aggLegacyBias) - Math.abs(aggTunedBias);
+            
+            let biasEl = document.getElementById('kpi-bias-delta');
+            biasEl.innerText = (biasDelta > 0 ? '-' : '+') + Math.abs(biasDelta).toFixed(1) + '%';
+            if(biasDelta > 0) {
+                biasEl.classList.remove('text-rose-600');
+                biasEl.classList.add('text-emerald-600');
+            } else {
+                biasEl.classList.remove('text-emerald-600');
+                biasEl.classList.add('text-rose-600');
+            }
+        }
+    }
+
+    function renderOverviewCharts() {
+        let labels = activeData.map(item => `${item.businessUnit} (L${item.lag})`);
+        let datasetsWape = { naive: [], legacy: [], tuned: [] };
+        let datasetsBias = { legacy: [], tuned: [] };
+
+        activeData.forEach(item => {
+            datasetsWape.naive.push(item.naiveWape);
+            datasetsWape.legacy.push(item.legacyWape);
+            datasetsWape.tuned.push(item.tunedWape);
+            datasetsBias.legacy.push(item.legacyBias);
+            datasetsBias.tuned.push(item.tunedBias);
+        });
+
+        if(chartInstanceWape) chartInstanceWape.destroy();
+        const ctxWape = document.getElementById('chartWape').getContext('2d');
+        chartInstanceWape = new Chart(ctxWape, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Naive', data: datasetsWape.naive, backgroundColor: 'rgba(203, 213, 225, 0.6)', borderRadius: 2 },
+                    { label: 'Legacy ODMC', data: datasetsWape.legacy, backgroundColor: 'rgba(239, 68, 68, 0.7)', borderRadius: 2 },
+                    { label: 'Tuned Engine', data: datasetsWape.tuned, backgroundColor: 'rgba(16, 185, 129, 0.9)', borderRadius: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+                scales: { y: { beginAtZero: true, grid: { borderDash: [2, 2] } }, x: { display: false } }
+            }
+        });
+
+        if(chartInstanceBias) chartInstanceBias.destroy();
+        const ctxBias = document.getElementById('chartBias').getContext('2d');
+        chartInstanceBias = new Chart(ctxBias, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Legacy Bias %', data: datasetsBias.legacy, backgroundColor: 'rgba(244, 63, 94, 0.5)', borderColor: 'rgba(244, 63, 94, 1)', borderWidth: 1 },
+                    { label: 'Tuned Bias %', data: datasetsBias.tuned, backgroundColor: 'rgba(56, 189, 248, 0.7)', borderColor: 'rgba(14, 165, 233, 1)', borderWidth: 1 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } },
+                scales: { y: { grid: { borderDash: [2, 2] } }, x: { display: false } }
+            }
+        });
+    }
+
+    function renderGridTable() {
+        const tbody = document.getElementById('grid-table-body');
+        tbody.innerHTML = '';
+
+        activeData.forEach(item => {
+            let statusBadge = item.passed 
+                ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800"><i class="fa-solid fa-check mr-1.5"></i> Passed</span>`
+                : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800"><i class="fa-solid fa-xmark mr-1.5"></i> Action Req</span>`;
+            
+            let rowColorClass = item.passed ? '' : 'bg-rose-50/20';
+            
+            const tr = document.createElement('tr');
+            tr.className = `${rowColorClass} transition duration-150 border-b border-slate-50`;
+            tr.innerHTML = `
+                <td class="py-4 px-6">
+                    <div class="font-semibold text-slate-900">${item.businessUnit}</div>
+                    <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mt-1">${item.segment}</div>
+                </td>
+                <td class="py-4 px-4 text-center font-mono text-xs text-slate-500">L${item.lag}</td>
+                <td class="py-4 px-4 text-right font-medium text-slate-700">${item.volume.toLocaleString()}</td>
+                <td class="py-4 px-4 text-right text-indigo-900/60 bg-indigo-50/20">${item.naiveWape.toFixed(1)}%</td>
+                <td class="py-4 px-4 text-right text-rose-700/80 bg-rose-50/30">${item.legacyWape.toFixed(1)}%</td>
+                <td class="py-4 px-4 text-right font-bold text-emerald-700 bg-emerald-50/30">${item.tunedWape.toFixed(1)}%</td>
+                <td class="py-4 px-4 text-center text-xs font-semibold ${item.wapeImpr > 0 ? 'text-emerald-600' : 'text-rose-600'}">${item.wapeImpr.toFixed(1)}%</td>
+                <td class="py-4 px-6 text-center">${statusBadge}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderWorkspaceTable() {
+        const tbody = document.getElementById('workspace-table-body');
+        tbody.innerHTML = '';
+
+        activeData.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.className = "border-b border-slate-100 hover:bg-slate-50";
+            tr.innerHTML = `
+                <td class="p-3">
+                    <div class="font-semibold text-slate-800">${item.businessUnit}</div>
+                </td>
+                <td class="p-3 text-right"><input type="number" id="edit-vol-${index}" value="${item.volume}" class="w-20 text-right text-xs border border-slate-300 rounded p-1"></td>
+                <td class="p-3 text-right"><input type="number" step="0.1" id="edit-legW-${index}" value="${item.legacyWape}" class="w-16 text-right text-xs border border-slate-300 rounded p-1"></td>
+                <td class="p-3 text-right"><input type="number" step="0.1" id="edit-tunW-${index}" value="${item.tunedWape}" class="w-16 text-right text-xs border border-slate-300 rounded p-1"></td>
+                <td class="p-3 text-right"><input type="number" step="0.1" id="edit-legB-${index}" value="${item.legacyBias}" class="w-16 text-right text-xs border border-slate-300 rounded p-1"></td>
+                <td class="p-3 text-right"><input type="number" step="0.1" id="edit-tunB-${index}" value="${item.tunedBias}" class="w-16 text-right text-xs border border-slate-300 rounded p-1"></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function applyWorkspaceChanges() {
+        activeData.forEach((item, index) => {
+            item.volume = parseFloat(document.getElementById(`edit-vol-${index}`).value) || 0;
+            item.legacyWape = parseFloat(document.getElementById(`edit-legW-${index}`).value) || 0;
+            item.tunedWape = parseFloat(document.getElementById(`edit-tunW-${index}`).value) || 0;
+            item.legacyBias = parseFloat(document.getElementById(`edit-legB-${index}`).value) || 0;
+            item.tunedBias = parseFloat(document.getElementById(`edit-tunB-${index}`).value) || 0;
+        });
+        saveStateToBrowser();
+        evaluateEngineMetrics();
+        renderOverviewCharts();
+        renderGridTable();
+        alertToast("Data updated and metrics recalculated.", "indigo");
+    }
+
+    function saveStateToBrowser() {
+        localStorage.setItem('af_odmc_dashboard_data', JSON.stringify(activeData));
+        localStorage.setItem('af_odmc_dashboard_rules', JSON.stringify(ruleState));
+    }
+
+    function loadStateFromBrowser() {
+        let savedData = localStorage.getItem('af_odmc_dashboard_data');
+        let savedRules = localStorage.getItem('af_odmc_dashboard_rules');
+        
+        if (savedData) activeData = JSON.parse(savedData);
+        else activeData = JSON.parse(JSON.stringify(baseDataSet));
+
+        if (savedRules) ruleState = JSON.parse(savedRules);
+    }
+
+    function restoreDefaultDataSet() {
+        activeData = JSON.parse(JSON.stringify(baseDataSet));
+        localStorage.removeItem('af_odmc_dashboard_data');
+        localStorage.removeItem('af_odmc_dashboard_rules');
+        
+        ruleState = { runnerWape: 5.0, repeaterWape: 3.0, biasRange: 5.0 };
+        document.getElementById('rule-runner-wape').value = 5.0;
+        document.getElementById('rule-repeater-wape').value = 3.0;
+        document.getElementById('rule-bias-range').value = 5.0;
+        document.getElementById('val-runner-wape').innerText = '5.0%';
+        document.getElementById('val-repeater-wape').innerText = '3.0%';
+        document.getElementById('val-bias-range').innerText = '5.0%';
+
+        evaluateEngineMetrics();
+        renderOverviewCharts();
+        renderGridTable();
+        renderWorkspaceTable();
+        alertToast("Reset to Default Demo Data", "indigo");
+    }
+
+    function resetThresholds() {
+        restoreDefaultDataSet();
+    }
+
+    function alertToast(message, color) {
+        const toast = document.createElement('div');
+        toast.className = `bg-${color}-600 text-white px-4 py-3 rounded-lg shadow-lg text-sm font-medium opacity-0 transition-opacity duration-300 transform translate-y-2 mb-2`;
+        toast.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> ${message}`;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        requestAnimationFrame(() => toast.classList.remove('opacity-0', 'translate-y-2'));
+        setTimeout(() => {
+            toast.classList.add('opacity-0');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 </script>
 </body>
 </html>
