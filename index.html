@@ -1,356 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demantra Tuning Performance Readout & Decision Analyzer</title>
+<!-- ... existing code ... -->
+    <title>ODMC Tuning Performance Readout & Decision Analyzer</title>
     <!-- Tailwind CSS for modern, sleek design system -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js for clean, animated reporting visualizations -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse for Client-Side ODMC CSV processing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <!-- FontAwesome for professional modern icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body class="text-slate-800 antialiased">
-
-<!-- Top Navigation Bar -->
-<header class="sticky top-0 z-50 bg-slate-900 text-white shadow-md border-b border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-            <div class="flex items-center space-x-3">
+<!-- ... existing code ... -->
                 <div class="bg-gradient-to-tr from-cyan-500 to-indigo-600 p-2 rounded-lg shadow-inner">
                     <i class="fa-solid fa-chart-line text-lg text-white"></i>
                 </div>
                 <div>
                     <h1 class="text-lg font-bold tracking-tight">Analytical Factor</h1>
-                    <p class="text-xs text-slate-400 font-medium">Oracle Demantra Tuning Engine Readout</p>
+                    <p class="text-xs text-slate-400 font-medium">Oracle ODMC Tuning Engine Readout</p>
                 </div>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <div class="hidden md:flex items-center space-x-2 bg-slate-800 px-3 py-1.5 rounded-full text-xs text-slate-300">
-                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                    <span class="font-semibold text-white">Client:</span>
-                    <span>Thermo Fisher Scientific (LSG)</span>
-                </div>
-                <!-- Dynamic Quick Export -->
-                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3 py-1.5 rounded-lg text-sm font-medium transition duration-150 flex items-center space-x-1.5">
-                    <i class="fa-solid fa-file-pdf"></i>
-                    <span>Print PDF</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
-
-<!-- Main Container -->
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-    <!-- Project Overview Card -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div>
+<!-- ... existing code ... -->
             <div class="flex items-center space-x-2 mb-2">
                 <span class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Project Phase: Evaluation</span>
                 <span class="text-slate-400 text-sm">•</span>
                 <span class="text-slate-500 text-sm font-medium"><i class="fa-regular fa-calendar-days mr-1"></i> May 2026</span>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900">Demantra Forecast Engine Performance Analyzer</h2>
+            <h2 class="text-2xl font-bold text-slate-900">ODMC Forecast Engine Performance Analyzer</h2>
             <p class="text-slate-600 mt-1 max-w-3xl">
-                Compare tuned engine performance against <strong>Legacy Demantra</strong> and <strong>Naïve Baselines</strong> using the 12-month rolling backtest (May 2025 – April 2026). Adjust target thresholds dynamically to inspect acceptance statuses.
+                Compare tuned engine performance against <strong>Legacy ODMC</strong> and <strong>Naïve Baselines</strong> using the 12-month rolling backtest (May 2025 – April 2026). Adjust target thresholds dynamically to inspect acceptance statuses.
             </p>
         </div>
-        
-        <!-- Live Totals Quick Cards -->
-        <div class="flex items-center gap-4 w-full md:w-auto bg-slate-50 p-4 rounded-xl border border-slate-100">
-            <div class="text-center px-4">
-                <span class="text-xs text-slate-500 block uppercase font-bold tracking-wider">Overall Pass Rate</span>
-                <span id="overall-pass-rate" class="text-2xl font-black text-indigo-600">0%</span>
-            </div>
-            <div class="h-10 w-px bg-slate-200"></div>
-            <div class="text-center px-4">
-                <span class="text-xs text-slate-500 block uppercase font-bold tracking-wider font-bold tracking-wider">Avg. WAPE Impr.</span>
-                <span id="avg-wape-improvement" class="text-2xl font-black text-emerald-600">+0.0%</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dashboard Tabs -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200 mb-8 gap-4">
-        <nav class="flex space-x-4 -mb-px" aria-label="Tabs">
-            <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn py-3 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 transition-all duration-150 flex items-center space-x-2">
-                <i class="fa-solid fa-display"></i>
-                <span>Executive Readout Dashboard</span>
-            </button>
+<!-- ... existing code ... -->
             <button onclick="switchTab('segment-grid')" id="tab-segment-grid" class="tab-btn py-3 px-4 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2">
                 <i class="fa-solid fa-list-check"></i>
                 <span>Interactive Segment Grid</span>
             </button>
-            <button onclick="switchTab('data-workspace')" id="tab-data-workspace" class="tab-btn py-3 px-4 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2">
+            <button onclick="switchTab('fva')" id="tab-fva" class="tab-btn py-3 px-4 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2">
                 <i class="fa-solid fa-sliders"></i>
-                <span>Data & Matrix Workspace</span>
+                <span>FVA</span>
             </button>
         </nav>
-        
-        <!-- Interactive Threshold quick switch info -->
-        <div class="bg-indigo-50 text-indigo-800 text-xs font-semibold rounded-lg px-3 py-1.5 flex items-center gap-1.5 mb-2 sm:mb-0">
-            <i class="fa-solid fa-circle-info text-sm"></i>
-            <span>Planners can tweak rules live in the sidebar!</span>
-        </div>
-    </div>
-
-    <!-- Outer grid layout combining primary content with Acceptance Threshold controls -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        <!-- Right/Left Sidebar: Acceptance Threshold Panel (Crucial for Business Planning Tool) -->
-        <div class="lg:col-span-1 bg-white rounded-2xl p-6 border border-slate-100 shadow-sm space-y-6">
-            <div class="border-b border-slate-100 pb-4">
-                <div class="flex items-center justify-between mb-1">
-                    <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-indigo-600"></i>
-                        <span>Acceptance Rules</span>
-                    </h3>
-                    <button onclick="resetThresholds()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">
-                        Reset Defaults
-                    </button>
-                </div>
-                <p class="text-xs text-slate-500">Mollie's Team: adjust success criteria and watch the dashboard update live.</p>
-            </div>
-
-            <!-- Runners Thresholds Group -->
-            <div class="space-y-4">
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Runners (High Vol / Low Volat)</span>
-                </div>
-                
-                <div>
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                        <span>Min Lag 1 WAPE Impr.</span>
-                        <span id="label-runner-wape" class="font-bold text-indigo-600">5.0%</span>
-                    </div>
-                    <input type="range" id="threshold-runner-wape" min="0" max="15" step="0.5" value="5.0" oninput="updateRules()" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-                
-                <div>
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                        <span>Max Bias +/- Limit</span>
-                        <span id="label-runner-bias" class="font-bold text-indigo-600">5.0%</span>
-                    </div>
-                    <input type="range" id="threshold-runner-bias" min="1" max="15" step="0.5" value="5.0" oninput="updateRules()" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-            </div>
-
-            <hr class="border-slate-100">
-
-            <!-- Repeaters Thresholds Group -->
-            <div class="space-y-4">
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-2 h-2 bg-amber-500 rounded-full"></span>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Repeaters (Mid Vol / Mid Volat)</span>
-                </div>
-                
-                <div>
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                        <span>Min Lag 1 WAPE Impr.</span>
-                        <span id="label-repeater-wape" class="font-bold text-indigo-600">4.0%</span>
-                    </div>
-                    <input type="range" id="threshold-repeater-wape" min="0" max="10" step="0.5" value="4.0" oninput="updateRules()" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-                
-                <div>
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                        <span>Max Bias +/- Limit</span>
-                        <span id="label-repeater-bias" class="font-bold text-indigo-600">8.0%</span>
-                    </div>
-                    <input type="range" id="threshold-repeater-bias" min="1" max="15" step="0.5" value="8.0" oninput="updateRules()" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-            </div>
-
-            <hr class="border-slate-100">
-
-            <!-- Strangers Thresholds Group -->
-            <div class="space-y-4">
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-2 h-2 bg-rose-500 rounded-full"></span>
-                    <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Strangers (Low Vol / Highly Volat)</span>
-                </div>
-                
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <p class="text-[11px] text-slate-500 leading-relaxed">
-                        <strong class="text-slate-700 block mb-0.5"><i class="fa-solid fa-triangle-exclamation text-amber-500 mr-1"></i>Rule Override for Volatiles:</strong> 
-                        Strangers are evaluated based on <strong>Bias Control</strong> and <strong>FVA over Naïve</strong> rather than absolute WAPE reduction benchmarks.
-                    </p>
-                </div>
-                
-                <div>
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                        <span>Strangers Max Bias</span>
-                        <span id="label-stranger-bias" class="font-bold text-indigo-600">12.0%</span>
-                    </div>
-                    <input type="range" id="threshold-stranger-bias" min="5" max="25" step="1" value="12.0" oninput="updateRules()" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-            </div>
-            
-            <hr class="border-slate-100">
-            
-            <!-- Global Success Win Rate Target -->
-            <div class="space-y-3">
-                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider block">Global Success Rules</span>
-                <div>
-                    <div class="flex justify-between text-xs font-medium text-slate-600 mb-1">
-                        <span>Min Portfolio Win Rate</span>
-                        <span id="label-portfolio-win" class="font-bold text-indigo-600">60%</span>
-                    </div>
-                    <input type="range" id="threshold-portfolio-win" min="40" max="90" step="5" value="60" oninput="updateRules()" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer">
-                </div>
-            </div>
-        </div>
-
-        <!-- Center Stage Main Screen Display Area -->
-        <div class="lg:col-span-3 space-y-8">
-            
-            <!-- TAB 1: EXECUTIVE READOUT OVERVIEW -->
-            <div id="section-overview" class="space-y-8">
-                
-                <!-- Quick Overview Numbers Metrics Panel -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <!-- Cards with beautiful modern depth styling -->
-                    <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-6 rounded-2xl shadow-sm relative overflow-hidden">
-                        <div class="absolute -right-4 -bottom-4 opacity-10">
-                            <i class="fa-solid fa-gauge-high text-9xl"></i>
-                        </div>
-                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-300">Overall FVA Winner</span>
+<!-- ... existing code ... -->
                         <div class="flex items-baseline space-x-1.5 mt-2">
                             <span id="card-fva-win" class="text-3xl font-extrabold text-white">8/8</span>
                             <span class="text-sm text-slate-300">Segments</span>
                         </div>
-                        <p class="text-xs text-indigo-200 mt-2 leading-relaxed">Tuned engine outperforms legacy Demantra forecast across all target divisions.</p>
+                        <p class="text-xs text-indigo-200 mt-2 leading-relaxed">Tuned engine outperforms legacy ODMC forecast across all target divisions.</p>
                     </div>
 
                     <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
                         <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Portfolio WAPE</span>
-                        <div class="flex items-baseline space-x-2 mt-2">
-                            <span id="card-total-wape" class="text-3xl font-extrabold text-slate-900">24.2%</span>
-                            <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                                <i class="fa-solid fa-caret-down"></i> <span id="card-wape-impr-pct">5.8%</span>
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">Downward trend in volume-weighted error. Down from 30.0% Legacy WAPE.</p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Average Absolute Bias</span>
-                        <div class="flex items-baseline space-x-2 mt-2">
-                            <span id="card-avg-bias" class="text-3xl font-extrabold text-slate-900">2.1%</span>
-                            <span class="text-xs text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                                <i class="fa-solid fa-circle-check"></i> <span>Within Limit</span>
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">Tuned engine successfully corrected systematic over-forecasting.</p>
-                    </div>
-                </div>
-
-                <!-- Dual Visual Charts Layout Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- Chart 1: WAPE Comparison -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                                <i class="fa-solid fa-chart-bar text-indigo-600"></i>
-                                <span>Weighted WAPE Comparison by Segment</span>
-                            </h3>
-                            <span class="text-xs text-slate-400 font-medium">Lower is better</span>
-                        </div>
-                        <div class="h-64">
-                            <canvas id="chartWape"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Chart 2: Bias Comparison -->
-                    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                                <i class="fa-solid fa-scale-balanced text-indigo-600"></i>
-                                <span>Absolute Bias Comparison</span>
-                            </h3>
-                            <span class="text-xs text-slate-400 font-medium">Goal: Close to 0%</span>
-                        </div>
+<!-- ... existing code ... -->
                         <div class="h-64">
                             <canvas id="chartBias"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI-Powered Smart Executive Summary Generator Card -->
-                <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white rounded-2xl shadow-xl p-6 border border-slate-800">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-5 mb-5">
-                        <div class="flex items-center space-x-3">
-                            <div class="bg-indigo-500/20 p-2.5 rounded-xl border border-indigo-500/30">
-                                <i class="fa-solid fa-wand-magic-sparkles text-xl text-indigo-400 animate-pulse"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-base font-bold text-white flex items-center gap-1.5">
-                                    <span>Executive Performance Analyst</span>
-                                    <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-400/20 uppercase tracking-wider">Gemini 3 Flash</span>
-                                </h3>
-                                <p class="text-xs text-slate-400">Generate instantly tailored strategic insights for Thermo Fisher S&OP meetings.</p>
-                            </div>
-                        </div>
-                        
-                        <!-- AI Actions Block with Secure API Key Input -->
-                        <div class="flex flex-col sm:flex-row items-end sm:items-center gap-3">
-                            <div class="flex items-center bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 shadow-inner focus-within:border-indigo-500 transition-colors">
-                                <i class="fa-solid fa-key text-slate-400 text-xs mr-2"></i>
-                                <!-- Type is password to mask the key during screen shares -->
-                                <input type="password" id="gemini-api-key" placeholder="Paste Gemini API Key..." class="bg-transparent border-none text-xs text-slate-200 focus:outline-none w-48 placeholder-slate-500">
-                            </div>
-                            <button id="btn-generate-ai" onclick="generateAISummary()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-md transition duration-150 flex items-center justify-center space-x-2 w-full sm:w-auto">
-                                <i class="fa-solid fa-robot"></i>
-                                <span>Analyze Active Data</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- AI Display Container -->
-                    <div class="space-y-4">
-                        <div id="ai-response-container" class="text-slate-300 text-sm leading-relaxed max-h-96 overflow-y-auto custom-scrollbar pr-2 space-y-4">
-                            <!-- Prepopulated with high-fidelity analytics analysis template in case user hasn't clicked generate -->
-                            <div class="border border-slate-800 bg-slate-950/50 p-4 rounded-xl">
-                                <p class="text-xs text-slate-400 italic mb-2"><i class="fa-solid fa-circle-info mr-1"></i> Standard Analytical Factor Readout insights based on initial datasets:</p>
-                                <p class="mb-3">Based on current thresholds (5% Runners Lag 1 WAPE improvement, 5% Bias limits), the <strong>Tuned AF Engine</strong> demonstrates outstanding compliance with Thermo Fisher Scientific's success guidelines:</p>
-                                <ul class="list-disc pl-5 space-y-1.5 text-xs text-slate-300">
-                                    <li><strong>Runners (High-Volume Portfolio):</strong> WAPE decreased significantly from an average of <span class="text-indigo-400 font-bold">28.5% to 22.8%</span>, representing a 5.7% absolute drop and passing the strict 5.0% success threshold.</li>
-                                    <li><strong>Strategic S&OP Value:</strong> High-impact Antibodies and chromatography items demonstrate stabilized Lag 3 forecasts, freeing estimated procurement safety stock margins.</li>
-                                    <li><strong>Bias Control:</strong> Over-forecasting on volatile Repeater components was successfully throttled down from <span class="text-rose-400 font-semibold">+8.5% to +1.2%</span>, mitigating downstream safety shelf clutter.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <!-- Spinner loader placeholder -->
-                        <div id="ai-loader" class="hidden flex flex-col items-center justify-center py-8 text-slate-400 space-y-3">
-                            <div class="animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
-                            <p class="text-xs text-indigo-300 animate-pulse font-medium">Gemini is synthesizing performance, FVA wins, and S&OP business impact metrics...</p>
                         </div>
                     </div>
                 </div>
@@ -359,41 +52,15 @@
 
             <!-- TAB 2: DETAILED INTERACTIVE SEGMENT GRID -->
             <div id="section-segment-grid" class="hidden space-y-6">
-                <!-- Filters and Quick Info Row -->
-                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex items-center space-x-2">
-                        <label class="text-xs font-bold uppercase text-slate-500 tracking-wider">Filter Segments:</label>
-                        <select id="grid-filter-segment" onchange="renderGridTable()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
-                            <option value="ALL">All Segments</option>
-                            <option value="Runners">Runners only</option>
-                            <option value="Repeaters">Repeaters only</option>
-                            <option value="Strangers">Strangers only</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center space-x-4 text-xs text-slate-500">
-                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Pass Segment Criteria</span>
-                        <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Action/Override Required</span>
-                    </div>
-                </div>
-
-                <!-- Master Structured Segment Table -->
-                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                    <div class="overflow-x-auto custom-scrollbar">
+<!-- ... existing code ... -->
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-500 text-[11px] font-bold uppercase tracking-wider border-b border-slate-100">
-                                    <th class="py-4 px-6">Demand Segment & Product Family</th>
+                                    <th class="py-4 px-6">Demand Segment & Business Unit</th>
                                     <th class="py-4 px-4 text-center">Lag</th>
                                     <th class="py-4 px-4 text-right">M. Vol (Units)</th>
                                     <th class="py-4 px-4 text-right bg-indigo-50/30 text-indigo-900">Naive WAPE</th>
-                                    <th class="py-4 px-4 text-right">Legacy WAPE</th>
-                                    <th class="py-4 px-4 text-right font-bold text-slate-900">Tuned WAPE</th>
-                                    <th class="py-4 px-4 text-right">Legacy Bias</th>
-                                    <th class="py-4 px-4 text-right font-bold text-slate-900">Tuned Bias</th>
-                                    <th class="py-4 px-6 text-center">Status</th>
-                                </tr>
-                            </thead>
+<!-- ... existing code ... -->
                             <tbody id="grid-table-body" class="divide-y divide-slate-50 text-sm text-slate-700">
                                 <!-- Generated Dynamically by JS -->
                             </tbody>
@@ -403,7 +70,7 @@
             </div>
 
             <!-- TAB 3: DATA WORKSPACE EDITOR & FORMULA APPENDIX -->
-            <div id="section-data-workspace" class="hidden space-y-8">
+            <div id="section-fva" class="hidden space-y-8">
                 
                 <!-- ODMC SaaS CSV Import Tool -->
                 <div class="bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border border-indigo-100 shadow-sm">
@@ -412,119 +79,53 @@
                             <h3 class="font-bold text-indigo-900 text-base mb-1 flex items-center gap-2">
                                 <i class="fa-solid fa-cloud-arrow-up text-indigo-600"></i> Raw ODMC Data Importer & Aggregator
                             </h3>
-                            <p class="text-xs text-indigo-700 mb-3 max-w-xl">Upload your raw SKU-level or time-series export from ODMC. The dashboard will automatically group the data by Product Family, aggregate the volumes, and mathematically compute the final WAPE and Bias formulas securely in your browser.</p>
+                            <p class="text-xs text-indigo-700 mb-3 max-w-xl">Upload your raw SKU-level or time-series export from ODMC. The dashboard will automatically group the data by Business Unit, aggregate the volumes, and mathematically compute the final WAPE and Bias formulas securely in your browser.</p>
                             <div class="flex items-center gap-3">
                                 <input type="file" id="odmc-csv-upload" accept=".csv" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer transition">
                             </div>
                         </div>
                         <div class="w-full md:w-auto bg-white/60 p-3 rounded-lg border border-indigo-100 text-[10px] text-indigo-800 font-mono shadow-sm">
                             <strong class="block mb-1 border-b border-indigo-200 pb-1">Expected Raw CSV Headers:</strong>
-                            Segment, Family, Lag, ActualQty, NaiveFcst, LegacyFcst, TunedFcst
+                            Plan, Business Unit, Item, Customer, Date, History, NaiveForecast, LegacyForecast, TunedForecast
                         </div>
                     </div>
                 </div>
 
                 <!-- Section Introductions -->
-                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-bold text-slate-900 text-base">Tuning Live Performance Sandbox</h3>
-                        <span id="save-status" class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded hidden transition-all duration-300"><i class="fa-solid fa-check mr-1"></i>Saved to Browser</span>
-                    </div>
-                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                        Do you want to test how the engine evaluation updates when real final outputs are loaded? Modify any of the values in the grid below. Clicking <strong>Save and Apply</strong> will rebuild the charts and re-verify pass/fail flags instantly.
-                    </p>
-
-                    <!-- Editable Data Table Grid -->
+<!-- ... existing code ... -->
                     <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-xl mb-4">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-500 font-bold uppercase border-b border-slate-200">
-                                    <th class="p-3">Product Segment Name</th>
+                                    <th class="p-3">Business Unit</th>
                                     <th class="p-3">Lag</th>
                                     <th class="p-3 text-right">Est. Volume</th>
-                                    <th class="p-3 text-right bg-slate-100/50">Naïve WAPE %</th>
-                                    <th class="p-3 text-right">Legacy WAPE %</th>
-                                    <th class="p-3 text-right text-indigo-700">Tuned WAPE %</th>
-                                    <th class="p-3 text-right">Legacy Bias %</th>
-                                    <th class="p-3 text-right text-indigo-700">Tuned Bias %</th>
-                                </tr>
-                            </thead>
+<!-- ... existing code ... -->
                             <tbody id="workspace-table-body">
                                 <!-- Loaded dynamically via JS for editability -->
                             </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Sandbox actions -->
-                    <div class="flex items-center justify-between mt-4">
-                        <button onclick="restoreDefaultDataSet()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold underline flex items-center gap-1 transition duration-150">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            <span>Clear Local Data & Restore Baseline</span>
-                        </button>
-                        <button onclick="saveAndApplyWorkspace()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm px-5 py-2 rounded-xl transition duration-150 flex items-center space-x-1.5 shadow">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Save to Browser & Apply Changes</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Equation Math Appendix Guide -->
-                <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                    <h4 class="font-bold text-slate-900 text-sm mb-4 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-info text-indigo-600"></i>
-                        <span>Appendix: Demantra Evaluation Math Hardcoded Rules</span>
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-600 leading-relaxed">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <strong class="text-slate-900 block mb-1">Weighted WAPE</strong>
-                            <p class="mb-2">Ensures high-volume error impacts are penalized heavier than random low-value items:</p>
-                            <div class="bg-slate-50 p-2 rounded text-center text-[10px] font-mono text-indigo-800">
-                                WAPE = Σ|Act - Frcst| / ΣAct
-                            </div>
-                        </div>
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <strong class="text-slate-900 block mb-1">Forecast Bias %</strong>
-                            <p class="mb-2">Indicates directional lean. Positive results reflect systematic over-buying excess risk:</p>
-                            <div class="bg-slate-50 p-2 rounded text-center text-[10px] font-mono text-indigo-800">
-                                Bias = Σ(Frcst - Act) / ΣAct
-                            </div>
-                        </div>
+<!-- ... existing code ... -->
                         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                             <strong class="text-slate-900 block mb-1">Relative FVA</strong>
-                            <p class="mb-2">Calculates raw improvement of our tuned engine parameters over the legacy Demantra state:</p>
+                            <p class="mb-2">Calculates raw improvement of our tuned engine parameters over the legacy ODMC state:</p>
                             <div class="bg-slate-50 p-2 rounded text-center text-[10px] font-mono text-indigo-800">
                                 Impr % = (LegWAPE - TunWAPE) / LegWAPE
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</main>
-
+<!-- ... existing code ... -->
 <footer class="bg-slate-900 text-slate-400 text-xs py-8 mt-16 border-t border-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
             <p>© 2026 Analytical Factor LLC. Partner Confidential.</p>
-            <p class="text-[10px] text-slate-500 mt-1">Configured for Oracle Demantra Engine Alignment — Life Sciences Group (LSG)</p>
+            <p class="text-[10px] text-slate-500 mt-1">Configured for Oracle ODMC Engine Alignment — Life Sciences Group (LSG)</p>
         </div>
-        <div class="flex space-x-6">
-            <a href="#" class="hover:text-white transition duration-150">Acceptance Criteria Matrix</a>
-            <span class="text-slate-700">|</span>
-            <a href="#" class="hover:text-white transition duration-150">Backtesting Documentation</a>
-        </div>
-    </div>
-</footer>
-
+<!-- ... existing code ... -->
 <script>
     // State Data: Realistic Thermo Fisher Scientific (Life Sciences Group) data representation
     let baseDataSet = [
         {
             id: 1,
             segment: "Runners",
-            family: "Cell Culture Media & Serum",
+            businessUnit: "Cell Culture Media & Serum",
             lag: 1,
             volume: 125000,
             naiveWape: 35.0,
@@ -536,7 +137,7 @@
         {
             id: 2,
             segment: "Runners",
-            family: "Cell Culture Media & Serum",
+            businessUnit: "Cell Culture Media & Serum",
             lag: 3,
             volume: 125000,
             naiveWape: 41.0,
@@ -548,7 +149,7 @@
         {
             id: 3,
             segment: "Runners",
-            family: "Purification Column Cartridges",
+            businessUnit: "Purification Column Cartridges",
             lag: 1,
             volume: 98000,
             naiveWape: 30.0,
@@ -560,7 +161,7 @@
         {
             id: 4,
             segment: "Repeaters",
-            family: "Monoclonal Antibodies & Reagents",
+            businessUnit: "Monoclonal Antibodies & Reagents",
             lag: 1,
             volume: 45000,
             naiveWape: 48.0,
@@ -572,7 +173,7 @@
         {
             id: 5,
             segment: "Repeaters",
-            family: "Precision Pipette Tips & Plastics",
+            businessUnit: "Precision Pipette Tips & Plastics",
             lag: 1,
             volume: 62000,
             naiveWape: 33.0,
@@ -584,7 +185,7 @@
         {
             id: 6,
             segment: "Strangers",
-            family: "Specialty Assay Kits",
+            businessUnit: "Specialty Assay Kits",
             lag: 1,
             volume: 12000,
             naiveWape: 68.0,
@@ -596,7 +197,7 @@
         {
             id: 7,
             segment: "Strangers",
-            family: "Chromatography Systems Parts",
+            businessUnit: "Chromatography Systems Parts",
             lag: 1,
             volume: 8500,
             naiveWape: 72.0,
@@ -608,7 +209,7 @@
         {
             id: 8,
             segment: "Strangers",
-            family: "Chromatography Systems Parts",
+            businessUnit: "Chromatography Systems Parts",
             lag: 3,
             volume: 8500,
             naiveWape: 80.0,
@@ -620,31 +221,15 @@
     ];
 
     // Workable reference state
-    let activeData = JSON.parse(JSON.stringify(baseDataSet));
+<!-- ... existing code ... -->
+    function switchTab(tabName) {
+        // Hide all active sections
+        document.getElementById('section-overview').classList.add('hidden');
+        document.getElementById('section-segment-grid').classList.add('hidden');
+        document.getElementById('section-fva').classList.add('hidden');
 
-    // Dynamic Planners' Rules configuration defaults
-    let thresholdRules = {
-        runnerWapeImpr: 5.0,
-        runnerBiasLimit: 5.0,
-        repeaterWapeImpr: 4.0,
-        repeaterBiasLimit: 8.0,
-        strangerBiasLimit: 12.0,
-        portfolioWinRate: 60
-    };
-
-    // Global Chart.js instances references
-    let chartInstanceWape = null;
-    let chartInstanceBias = null;
-
-    window.onload = function() {
-        loadStateFromBrowser(); // Check for saved ODMC data or rules
-        evaluateEngineMetrics();
-        renderOverviewCharts();
-        renderGridTable();
-        renderWorkspaceTable();
-        setupCSVUploader();
-    };
-
+        // Reset tabs style
+<!-- ... existing code ... -->
     function setupCSVUploader() {
         const fileInput = document.getElementById('odmc-csv-upload');
         if(fileInput) {
@@ -660,20 +245,20 @@
                         try {
                             const rawData = results.data;
                             
-                            // Aggregation Engine: Group raw rows by Family and Lag
+                            // Aggregation Engine: Group raw rows by Business Unit
                             let grouped = {};
                             
                             rawData.forEach(row => {
                                 // Skip invalid rows
-                                if(!row.Family || typeof row.ActualQty === 'undefined') return;
+                                if(!row['Business Unit'] || typeof row.History === 'undefined') return;
                                 
-                                let key = `${row.Family}_${row.Lag}`;
+                                let key = `${row['Business Unit']}`;
                                 
                                 if(!grouped[key]) {
                                     grouped[key] = {
-                                        segment: row.Segment || "Strangers",
-                                        family: row.Family,
-                                        lag: parseInt(row.Lag) || 1,
+                                        segment: row.Segment || "Runners",
+                                        businessUnit: row['Business Unit'],
+                                        lag: 1,
                                         sumActual: 0,
                                         sumAbsErrNaive: 0,
                                         sumAbsErrLegacy: 0,
@@ -683,10 +268,10 @@
                                     };
                                 }
                                 
-                                let actual = parseFloat(row.ActualQty) || 0;
-                                let naive = parseFloat(row.NaiveFcst) || 0;
-                                let legacy = parseFloat(row.LegacyFcst) || 0;
-                                let tuned = parseFloat(row.TunedFcst) || 0;
+                                let actual = parseFloat(row.History) || 0;
+                                let naive = parseFloat(row.NaiveForecast) || 0;
+                                let legacy = parseFloat(row.LegacyForecast) || 0;
+                                let tuned = parseFloat(row.TunedForecast) || 0;
                                 
                                 grouped[key].sumActual += actual;
                                 grouped[key].sumAbsErrNaive += Math.abs(naive - actual);
@@ -708,7 +293,7 @@
                                 newData.push({
                                     id: idCounter++,
                                     segment: g.segment,
-                                    family: g.family,
+                                    businessUnit: g.businessUnit,
                                     lag: g.lag,
                                     volume: g.sumActual,
                                     naiveWape: (g.sumAbsErrNaive / actVol) * 100,
@@ -721,424 +306,37 @@
                             
                             activeData = newData;
                             saveStateToBrowser();
-                            evaluateEngineMetrics();
-                            renderOverviewCharts();
-                            renderGridTable();
-                            renderWorkspaceTable();
-                            
-                            alertToast("ODMC Raw Data Aggregated & Imported!", "emerald");
-                            fileInput.value = ""; // reset UI
-                        } catch (err) {
-                            console.error(err);
-                            alertToast("Error parsing CSV. Please check column headers.", "rose");
-                        }
-                    }
-                });
-            });
-        }
-    }
-
-    function saveStateToBrowser() {
-        localStorage.setItem('af_odmc_dashboard_data', JSON.stringify(activeData));
-        localStorage.setItem('af_odmc_dashboard_rules', JSON.stringify(thresholdRules));
-        
-        const status = document.getElementById('save-status');
-        if(status) {
-            status.classList.remove('hidden');
-            setTimeout(() => status.classList.add('hidden'), 2000);
-        }
-    }
-
-    function loadStateFromBrowser() {
-        const savedData = localStorage.getItem('af_odmc_dashboard_data');
-        const savedRules = localStorage.getItem('af_odmc_dashboard_rules');
-        
-        if (savedData) activeData = JSON.parse(savedData);
-        if (savedRules) thresholdRules = JSON.parse(savedRules);
-        
-        // Sync visual sliders to the loaded rules
-        document.getElementById('threshold-runner-wape').value = thresholdRules.runnerWapeImpr;
-        document.getElementById('threshold-runner-bias').value = thresholdRules.runnerBiasLimit;
-        document.getElementById('threshold-repeater-wape').value = thresholdRules.repeaterWapeImpr;
-        document.getElementById('threshold-repeater-bias').value = thresholdRules.repeaterBiasLimit;
-        document.getElementById('threshold-stranger-bias').value = thresholdRules.strangerBiasLimit;
-        document.getElementById('threshold-portfolio-win').value = thresholdRules.portfolioWinRate;
-        
-        // Update slider UI labels
-        document.getElementById('label-runner-wape').innerText = `${thresholdRules.runnerWapeImpr.toFixed(1)}%`;
-        document.getElementById('label-runner-bias').innerText = `${thresholdRules.runnerBiasLimit.toFixed(1)}%`;
-        document.getElementById('label-repeater-wape').innerText = `${thresholdRules.repeaterWapeImpr.toFixed(1)}%`;
-        document.getElementById('label-repeater-bias').innerText = `${thresholdRules.repeaterBiasLimit.toFixed(1)}%`;
-        document.getElementById('label-stranger-bias').innerText = `${thresholdRules.strangerBiasLimit.toFixed(1)}%`;
-        document.getElementById('label-portfolio-win').innerText = `${thresholdRules.portfolioWinRate}%`;
-    }
-
-    function alertToast(message, color = "emerald") {
-        const feedbackToast = document.createElement('div');
-        feedbackToast.className = `fixed bottom-5 right-5 z-50 bg-${color}-600 text-white px-5 py-3 rounded-xl shadow-lg flex items-center space-x-2 transition duration-300 transform translate-y-0 opacity-100`;
-        feedbackToast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span class="text-xs font-bold">${message}</span>`;
-        document.body.appendChild(feedbackToast);
-        setTimeout(() => {
-            feedbackToast.style.opacity = '0';
-            setTimeout(() => feedbackToast.remove(), 300);
-        }, 2500);
-    }
-
-    function switchTab(tabName) {
-        // Hide all active sections
-        document.getElementById('section-overview').classList.add('hidden');
-        document.getElementById('section-segment-grid').classList.add('hidden');
-        document.getElementById('section-data-workspace').classList.add('hidden');
-
-        // Reset tabs style
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(tab => {
-            tab.className = "tab-btn py-3 px-4 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2";
-        });
-
-        // Set clicked active style
-        const activeTab = document.getElementById('tab-' + tabName);
-        activeTab.className = "tab-btn py-3 px-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 transition-all duration-150 flex items-center space-x-2";
-
-        // Show targets
-        document.getElementById('section-' + tabName).classList.remove('hidden');
-
-        // Redraw charts if visible to avoid container scaling render issues
-        if(tabName === 'overview') {
-            setTimeout(renderOverviewCharts, 50);
-        }
-    }
-
-    function evaluateEngineMetrics() {
-        let totalLegacyWapeWeighted = 0;
-        let totalTunedWapeWeighted = 0;
-        let totalVolume = 0;
-        let absoluteBiasTunedSum = 0;
-        let totalItems = activeData.length;
-        let passCount = 0;
-
-        activeData.forEach(item => {
-            // Apply volume weightings for aggregate total WAPE calculation
-            totalLegacyWapeWeighted += item.legacyWape * item.volume;
-            totalTunedWapeWeighted += item.tunedWape * item.volume;
-            totalVolume += item.volume;
-
-            absoluteBiasTunedSum += Math.abs(item.tunedBias);
-
-            // Compute Segment Pass/Fail status dynamically
-            let status = false;
-            let relativeWapeReduction = ((item.legacyWape - item.tunedWape) / item.legacyWape) * 100;
-            let absTunedBias = Math.abs(item.tunedBias);
-
-            if (item.segment === "Runners") {
-                let wapeSuccess = relativeWapeReduction >= thresholdRules.runnerWapeImpr;
-                let biasSuccess = absTunedBias <= thresholdRules.runnerBiasLimit;
-                status = wapeSuccess && biasSuccess;
-            } else if (item.segment === "Repeaters") {
-                let wapeSuccess = relativeWapeReduction >= thresholdRules.repeaterWapeImpr;
-                let biasSuccess = absTunedBias <= thresholdRules.repeaterBiasLimit;
-                status = wapeSuccess && biasSuccess;
-            } else { // Strangers
-                // Strangers check WAPE better than Naive, plus Bias range check
-                let fvaSuccess = item.tunedWape < item.naiveWape;
-                let biasSuccess = absTunedBias <= thresholdRules.strangerBiasLimit;
-                status = fvaSuccess && biasSuccess;
-            }
-
-            item.isPass = status;
-            item.relativeWapeReduction = relativeWapeReduction;
-            if (status) passCount++;
-        });
-
-        // Portfolio Stats
-        let aggregateLegacyWape = totalLegacyWapeWeighted / totalVolume;
-        let aggregateTunedWape = totalTunedWapeWeighted / totalVolume;
-        let avgWapeImprovementPct = aggregateLegacyWape - aggregateTunedWape;
-        let passRatePct = (passCount / totalItems) * 100;
-        let averageTunedAbsBias = absoluteBiasTunedSum / totalItems;
-
-        // Render to UI elements
-        document.getElementById('overall-pass-rate').innerText = `${passRatePct.toFixed(0)}%`;
-        document.getElementById('avg-wape-improvement').innerText = `+${avgWapeImprovementPct.toFixed(1)}%`;
-        
-        document.getElementById('card-fva-win').innerText = `${passCount}/${totalItems}`;
-        document.getElementById('card-total-wape').innerText = `${aggregateTunedWape.toFixed(1)}%`;
-        document.getElementById('card-wape-impr-pct').innerText = `${avgWapeImprovementPct.toFixed(1)}%`;
-        document.getElementById('card-avg-bias').innerText = `${averageTunedAbsBias.toFixed(1)}%`;
-    }
-
-    function updateRules() {
-        // Read dynamic rules inputs
-        thresholdRules.runnerWapeImpr = parseFloat(document.getElementById('threshold-runner-wape').value);
-        thresholdRules.runnerBiasLimit = parseFloat(document.getElementById('threshold-runner-bias').value);
-        thresholdRules.repeaterWapeImpr = parseFloat(document.getElementById('threshold-repeater-wape').value);
-        thresholdRules.repeaterBiasLimit = parseFloat(document.getElementById('threshold-repeater-bias').value);
-        thresholdRules.strangerBiasLimit = parseFloat(document.getElementById('threshold-stranger-bias').value);
-        thresholdRules.portfolioWinRate = parseInt(document.getElementById('threshold-portfolio-win').value);
-
-        // Update indicators text
-        document.getElementById('label-runner-wape').innerText = `${thresholdRules.runnerWapeImpr.toFixed(1)}%`;
-        document.getElementById('label-runner-bias').innerText = `${thresholdRules.runnerBiasLimit.toFixed(1)}%`;
-        document.getElementById('label-repeater-wape').innerText = `${thresholdRules.repeaterWapeImpr.toFixed(1)}%`;
-        document.getElementById('label-repeater-bias').innerText = `${thresholdRules.repeaterBiasLimit.toFixed(1)}%`;
-        document.getElementById('label-stranger-bias').innerText = `${thresholdRules.strangerBiasLimit.toFixed(1)}%`;
-        document.getElementById('label-portfolio-win').innerText = `${thresholdRules.portfolioWinRate}%`;
-
-        saveStateToBrowser();
-
-        // Recalculate everything live
-        evaluateEngineMetrics();
-        renderGridTable();
-    }
-
-    function resetThresholds() {
-        document.getElementById('threshold-runner-wape').value = 5.0;
-        document.getElementById('threshold-runner-bias').value = 5.0;
-        document.getElementById('threshold-repeater-wape').value = 4.0;
-        document.getElementById('threshold-repeater-bias').value = 8.0;
-        document.getElementById('threshold-stranger-bias').value = 12.0;
-        document.getElementById('threshold-portfolio-win').value = 60;
-        updateRules();
-    }
-
+<!-- ... existing code ... -->
     function renderOverviewCharts() {
         // Extract unique labels for Chromatography / Media product lines
-        let labels = activeData.map(item => `${item.family} (L${item.lag})`);
+        let labels = activeData.map(item => `${item.businessUnit} (L${item.lag})`);
         
         let datasetsWape = {
-            naive: activeData.map(item => item.naiveWape),
-            legacy: activeData.map(item => item.legacyWape),
-            tuned: activeData.map(item => item.tunedWape)
-        };
-
-        let datasetsBias = {
-            legacy: activeData.map(item => item.legacyBias),
-            tuned: activeData.map(item => item.tunedBias)
-        };
-
-        // Render Chart 1 (WAPE Compare)
-        if (chartInstanceWape) chartInstanceWape.destroy();
-        const ctxWape = document.getElementById('chartWape').getContext('2d');
-        chartInstanceWape = new Chart(ctxWape, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
+<!-- ... existing code ... -->
                     {
-                        label: 'Naive Baseline',
-                        data: datasetsWape.naive,
-                        backgroundColor: 'rgba(148, 163, 184, 0.4)',
-                        borderColor: '#94a3b8',
-                        borderWidth: 1.5,
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Legacy Demantra',
+                        label: 'Legacy ODMC',
                         data: datasetsWape.legacy,
                         backgroundColor: 'rgba(239, 68, 68, 0.7)',
-                        borderColor: '#ef4444',
-                        borderWidth: 1.5,
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Tuned AF Engine',
-                        data: datasetsWape.tuned,
-                        backgroundColor: 'rgba(79, 70, 229, 0.95)',
-                        borderColor: '#4f46e5',
-                        borderWidth: 1.5,
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: '#f1f5f9' },
-                        title: { display: true, text: 'WAPE %', font: { size: 10, weight: 'bold' } }
-                    },
-                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-                }
-            }
-        });
-
-        // Render Chart 2 (Bias Compare)
-        if (chartInstanceBias) chartInstanceBias.destroy();
-        const ctxBias = document.getElementById('chartBias').getContext('2d');
-        chartInstanceBias = new Chart(ctxBias, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Legacy Bias',
-                        data: datasetsBias.legacy,
-                        backgroundColor: 'rgba(239, 68, 68, 0.4)',
-                        borderColor: '#ef4444',
-                        borderWidth: 1.5,
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Tuned Bias',
-                        data: datasetsBias.tuned,
-                        backgroundColor: 'rgba(16, 185, 129, 0.95)',
-                        borderColor: '#10b981',
-                        borderWidth: 1.5,
-                        borderRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
-                },
-                scales: {
-                    y: { 
-                        grid: { color: '#f1f5f9' },
-                        title: { display: true, text: 'Bias % (Over/Under)', font: { size: 10, weight: 'bold' } }
-                    },
-                    x: { grid: { display: false }, ticks: { font: { size: 9 } } }
-                }
-            }
-        });
-    }
-
-    function renderGridTable() {
-        const filterVal = document.getElementById('grid-filter-segment').value;
-        const tbody = document.getElementById('grid-table-body');
-        tbody.innerHTML = '';
-
-        activeData.forEach(item => {
-            if (filterVal !== 'ALL' && item.segment !== filterVal) return;
-
-            const relativeWapeReduction = ((item.legacyWape - item.tunedWape) / item.legacyWape) * 100;
-            const absoluteTunedBias = Math.abs(item.tunedBias);
-
-            // Construct Badge and Color Styles based on Pass Status
-            let statusBadge = '';
-            let rowColorClass = '';
-
-            if (item.isPass) {
-                statusBadge = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-circle-check"></i> Passed</span>`;
-                rowColorClass = "hover:bg-slate-50/50";
-            } else {
-                statusBadge = `<span class="inline-flex items-center gap-1 bg-rose-50 text-rose-700 text-xs font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-triangle-exclamation"></i> Action</span>`;
-                rowColorClass = "bg-rose-50/10 hover:bg-rose-50/20";
-            }
-
-            // Segment Tag Color Coding
-            let segmentTag = '';
-            if (item.segment === "Runners") {
-                segmentTag = `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${item.segment}</span>`;
-            } else if (item.segment === "Repeaters") {
-                segmentTag = `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${item.segment}</span>`;
-            } else {
-                segmentTag = `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${item.segment}</span>`;
-            }
-
-            const tr = document.createElement('tr');
+<!-- ... existing code ... -->
             tr.className = `${rowColorClass} transition duration-150`;
             tr.innerHTML = `
                 <td class="py-4 px-6">
-                    <div class="font-semibold text-slate-900">${item.family}</div>
+                    <div class="font-semibold text-slate-900">${item.businessUnit}</div>
                     <div class="flex items-center space-x-2 mt-1">
                         ${segmentTag}
                         <span class="text-slate-400 text-xs">ID: ${item.id}</span>
                     </div>
-                </td>
-                <td class="py-4 px-4 text-center">
-                    <span class="bg-slate-100 text-slate-800 text-xs font-bold px-2 py-1 rounded">Lag ${item.lag}</span>
-                </td>
-                <td class="py-4 px-4 text-right text-xs font-medium text-slate-500">
-                    ${item.volume.toLocaleString()}
-                </td>
-                <td class="py-4 px-4 text-right text-slate-500 bg-indigo-50/10">
-                    ${item.naiveWape.toFixed(1)}%
-                </td>
-                <td class="py-4 px-4 text-right text-slate-500">
-                    ${item.legacyWape.toFixed(1)}%
-                </td>
-                <td class="py-4 px-4 text-right font-bold text-indigo-700">
-                    ${item.tunedWape.toFixed(1)}%
-                    <span class="block text-[10px] text-emerald-600 font-medium">(${relativeWapeReduction.toFixed(1)}% Impr)</span>
-                </td>
-                <td class="py-4 px-4 text-right text-slate-500">
-                    ${item.legacyBias > 0 ? '+' : ''}${item.legacyBias.toFixed(1)}%
-                </td>
-                <td class="py-4 px-4 text-right font-bold ${absoluteTunedBias < 5 ? 'text-emerald-600' : 'text-slate-900'}">
-                    ${item.tunedBias > 0 ? '+' : ''}${item.tunedBias.toFixed(1)}%
-                </td>
-                <td class="py-4 px-6 text-center">
-                    ${statusBadge}
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function renderWorkspaceTable() {
-        const tbody = document.getElementById('workspace-table-body');
-        tbody.innerHTML = '';
-
+<!-- ... existing code ... -->
         activeData.forEach((item, index) => {
             const tr = document.createElement('tr');
             tr.className = "border-b border-slate-100 hover:bg-slate-50";
             tr.innerHTML = `
                 <td class="p-3">
-                    <div class="font-semibold text-slate-800">${item.family}</div>
+                    <div class="font-semibold text-slate-800">${item.businessUnit}</div>
                     <span class="text-[10px] uppercase text-slate-400">${item.segment}</span>
                 </td>
                 <td class="p-3">Lag ${item.lag}</td>
-                <td class="p-3 text-right">
-                    <input type="number" id="edit-vol-${index}" value="${item.volume}" class="w-20 text-right p-1 border rounded bg-white text-slate-700 focus:outline-indigo-600">
-                </td>
-                <td class="p-3 text-right bg-slate-50/50">
-                    <input type="number" step="0.1" id="edit-naive-${index}" value="${item.naiveWape}" class="w-16 text-right p-1 border rounded bg-white text-slate-700 focus:outline-indigo-600">
-                </td>
-                <td class="p-3 text-right">
-                    <input type="number" step="0.1" id="edit-legwape-${index}" value="${item.legacyWape}" class="w-16 text-right p-1 border rounded bg-white text-slate-700 focus:outline-indigo-600">
-                </td>
-                <td class="p-3 text-right">
-                    <input type="number" step="0.1" id="edit-tunwape-${index}" value="${item.tunedWape}" class="w-16 text-right p-1 border rounded bg-emerald-50 text-emerald-800 font-bold focus:outline-indigo-600">
-                </td>
-                <td class="p-3 text-right">
-                    <input type="number" step="0.1" id="edit-legbias-${index}" value="${item.legacyBias}" class="w-16 text-right p-1 border rounded bg-white text-slate-700 focus:outline-indigo-600">
-                </td>
-                <td class="p-3 text-right">
-                    <input type="number" step="0.1" id="edit-tunbias-${index}" value="${item.tunedBias}" class="w-16 text-right p-1 border rounded bg-emerald-50 text-emerald-800 font-bold focus:outline-indigo-600">
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function saveAndApplyWorkspace() {
-        activeData.forEach((item, index) => {
-            item.volume = parseInt(document.getElementById(`edit-vol-${index}`).value) || 0;
-            item.naiveWape = parseFloat(document.getElementById(`edit-naive-${index}`).value) || 0;
-            item.legacyWape = parseFloat(document.getElementById(`edit-legwape-${index}`).value) || 0;
-            item.tunedWape = parseFloat(document.getElementById(`edit-tunwape-${index}`).value) || 0;
-            item.legacyBias = parseFloat(document.getElementById(`edit-legbias-${index}`).value) || 0;
-            item.tunedBias = parseFloat(document.getElementById(`edit-tunbias-${index}`).value) || 0;
-        });
-
-        saveStateToBrowser();
-
-        // Trigger evaluations, update visual renders
-        evaluateEngineMetrics();
-        renderOverviewCharts();
-        renderGridTable();
-        
-        alertToast("Successfully saved to browser and applied changes!");
-    }
-
+<!-- ... existing code ... -->
     function restoreDefaultDataSet() {
         activeData = JSON.parse(JSON.stringify(baseDataSet));
         localStorage.removeItem('af_odmc_dashboard_data');
@@ -1149,124 +347,6 @@
         renderGridTable();
         renderWorkspaceTable();
         alertToast("Reset to Default Baseline Data", "indigo");
-    }
-
-    async function generateAISummary() {
-        const apiKeyInput = document.getElementById('gemini-api-key').value.trim();
-        
-        if (!apiKeyInput) {
-            alertToast("Please paste your Gemini API Key first.", "rose");
-            return;
-        }
-
-        const loader = document.getElementById('ai-loader');
-        const container = document.getElementById('ai-response-container');
-        const btn = document.getElementById('btn-generate-ai');
-
-        loader.classList.remove('hidden');
-        container.classList.add('hidden');
-        btn.disabled = true;
-
-        // Collect and serialize the current active stats context to feed the AI
-        let briefSummaryData = activeData.map(item => {
-            let relativeImprovement = ((item.legacyWape - item.tunedWape) / item.legacyWape) * 100;
-            return `Product Family: "${item.family}", Segment: "${item.segment}", Lag: ${item.lag}, Legacy WAPE: ${item.legacyWape}%, Tuned WAPE: ${item.tunedWape}% (Improvement of ${relativeImprovement.toFixed(1)}%), Legacy Bias: ${item.legacyBias}%, Tuned Bias: ${item.tunedBias}% (Pass Rule: ${item.isPass ? 'YES' : 'NO'})`;
-        }).join('\n');
-
-        const systemPrompt = `You are a world-class Supply Chain Consultant working for Analytical Factor. You are analyzing newly tuned Oracle Demantra Forecasting Engine parameters compared against Legacy performance. Write an impactful, executive-level diagnostic memo addressed to Thermo Fisher LSG Leadership (Mollie Bubar, Scott Landis). Focus on business outcomes, WAPE reductions, risk reduction via bias alignment, and action points.`;
-        
-        const userQuery = `Analyze the following backtesting performance results:
-        
-        Current Configured Targets:
-        - Runners Lag 1 target reduction: ${thresholdRules.runnerWapeImpr}%
-        - Runners Bias bounds limit: +/- ${thresholdRules.runnerBiasLimit}%
-        - Repeaters Lag 1 target reduction: ${thresholdRules.repeaterWapeImpr}%
-        
-        Performance Dataset:
-        ${briefSummaryData}
-        
-        Please format your output cleanly in neat, structured markdown with bullet points. Cover:
-        1. Executive Takeaway (1 concise, powerful paragraph summarizing ROI).
-        2. Portfolio Performance Highlights (where we succeeded most and where safety stock will optimize).
-        3. Strategic Action Items for the S&OP Alignment Meeting (specifically referencing any segments labeled with Pass Rule: NO).`;
-
-        try {
-            // Using the target gemini-3-flash-preview model for optimized, fast analysis
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKeyInput}`;
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] }
-                })
-            });
-            
-            let errorMessage = "Invalid API Key or API Error. Please check your key and try again.";
-            
-            // Extract precise error feedback from Google's response if the connection fails
-            if (!response.ok) {
-                try {
-                    const errorJson = await response.json();
-                    if (errorJson.error && errorJson.error.message) {
-                        errorMessage = `Google API Error: ${errorJson.error.message} (Code: ${errorJson.error.code || 'Unknown'})`;
-                    }
-                } catch (e) {
-                    errorMessage = `HTTP Error ${response.status}: ${response.statusText}`;
-                }
-                throw new Error(errorMessage);
-            }
-
-            const result = await response.json();
-            const generatedText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            if (generatedText) {
-                // Formatting markdown symbols to simple clean HTML
-                let formattedHtml = generatedText
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/### (.*?)\n/g, '<h4 class="text-base font-bold text-indigo-400 mt-4 mb-2">$1</h4>')
-                    .replace(/## (.*?)\n/g, '<h3 class="text-lg font-bold text-white mt-5 mb-3">$1</h3>')
-                    .replace(/\n\n/g, '<br/>')
-                    .replace(/- (.*?)\n/g, '<li class="ml-4 list-disc text-slate-300 text-xs my-1">$1</li>');
-
-                container.innerHTML = `
-                    <div class="border border-indigo-500/30 bg-indigo-950/40 p-5 rounded-xl space-y-4">
-                        <div class="flex items-center justify-between text-xs text-indigo-400 border-b border-indigo-500/20 pb-2">
-                            <span><i class="fa-solid fa-robot"></i> Live Gemini Analysis Completed</span>
-                            <span>May 2026 Audit Draft</span>
-                        </div>
-                        <div class="prose prose-invert text-xs leading-relaxed space-y-2">
-                            ${formattedHtml}
-                        </div>
-                    </div>
-                `;
-            } else {
-                throw new Error("Unable to parse text from Gemini API candidate parts.");
-            }
-
-        } catch (error) {
-            console.error(error);
-            // Dynamic on-screen diagnostic rendering
-            container.innerHTML = `
-                <div class="border border-rose-500/20 bg-slate-950/80 p-5 rounded-xl text-slate-300">
-                    <p class="text-rose-400 text-xs font-bold mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-triangle-exclamation"></i> API Connection Issue Detected
-                    </p>
-                    <p class="text-xs leading-relaxed mb-4">
-                        ${error.message}
-                    </p>
-                    <p class="text-[10px] text-slate-500 italic border-t border-slate-800 pt-3">
-                        Troubleshooting Tip: Click the copy icon in Google AI Studio to make sure the key wasn't truncated, and paste it directly into the input.
-                    </p>
-                </div>
-            `;
-        } finally {
-            loader.classList.add('hidden');
-            container.classList.remove('hidden');
-            btn.disabled = false;
-        }
     }
 </script>
 </body>
