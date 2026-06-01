@@ -72,9 +72,9 @@
                 <span class="text-slate-400 text-sm">•</span>
                 <span class="text-slate-500 text-sm font-medium"><i class="fa-regular fa-calendar-days mr-1"></i> Current Assessment</span>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900">ODMC Forecast Engine Performance Analyzer</h2>
+            <h2 class="text-2xl font-bold text-slate-900">ODMC Forecast Value Added (FVA) Analyzer</h2>
             <p class="text-slate-600 mt-1 max-w-3xl">
-                Compare tuned engine performance against <strong>Legacy ODMC</strong> and <strong>Naïve Baselines</strong>. Adjust target thresholds dynamically to inspect acceptance statuses.
+                Compare tuned engine performance against <strong>Legacy ODMC</strong> and <strong>Naïve Baselines</strong> to generate the formal <strong>FVA Report</strong>. Adjust target thresholds dynamically to inspect acceptance statuses.
             </p>
         </div>
         <div class="flex space-x-2">
@@ -93,7 +93,7 @@
             </button>
             <button onclick="switchTab('segment-grid')" id="tab-segment-grid" class="tab-btn py-3 px-6 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2 whitespace-nowrap">
                 <i class="fa-solid fa-list-check"></i>
-                <span>Segment Analysis</span>
+                <span>FVA Report</span>
             </button>
             <button onclick="switchTab('fva')" id="tab-fva" class="tab-btn py-3 px-6 font-medium text-sm text-slate-500 border-b-2 border-transparent hover:text-slate-700 hover:border-slate-300 transition-all duration-150 flex items-center space-x-2 whitespace-nowrap">
                 <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -177,12 +177,12 @@
                                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                     <i class="fa-solid fa-arrow-trend-down text-4xl text-emerald-600"></i>
                                 </div>
-                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Vol-Weighted WAPE Impr.</span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">Forecast Value Added (FVA)</span>
                                 <div class="flex items-baseline space-x-2">
                                     <span id="kpi-wape-impr" class="text-3xl font-extrabold text-slate-800">0.0%</span>
                                     <span class="text-sm font-medium text-emerald-600"><i class="fa-solid fa-caret-down"></i> vs Legacy</span>
                                 </div>
-                                <p class="text-[10px] text-slate-500 mt-2">Relative reduction in aggregate WAPE error.</p>
+                                <p class="text-[10px] text-slate-500 mt-2">Relative reduction in aggregate WAPE error (Volume-Weighted).</p>
                             </div>
 
                             <!-- Bias Correction -->
@@ -229,8 +229,8 @@
             <div id="section-segment-grid" class="hidden space-y-6">
                 <div class="flex justify-between items-end mb-4">
                     <div>
-                        <h3 class="font-bold text-slate-900">Segment Compliance Matrix</h3>
-                        <p class="text-xs text-slate-500">Live evaluation of each business unit against the dynamic thresholds set in the overview tab.</p>
+                        <h3 class="font-bold text-slate-900">FVA Segment Report & Compliance</h3>
+                        <p class="text-xs text-slate-500">Formal Forecast Value Added (FVA) evaluation of each business unit against dynamic thresholds.</p>
                     </div>
                 </div>
 
